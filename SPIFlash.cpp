@@ -17,7 +17,7 @@
 /// Constructor. JedecID is optional but recommended, since this will ensure that the device is present and has a valid response
 /// get this from the datasheet of your flash chip
 /// Example for Atmel-Adesto 4Mbit AT25DF041A: 0x1F44 (page 27: http://www.adestotech.com/sites/default/files/datasheets/doc3668.pdf)
-/// Example for Winbond 4Mbit W25X40CL: 0x9F30 (page 14: http://www.winbond.com/NR/rdonlyres/6E25084C-0BFE-4B25-903D-AE10221A0929/0/W25X40CL.pdf)
+/// Example for Winbond 4Mbit W25X40CL: 0xEF30 (page 14: http://www.winbond.com/NR/rdonlyres/6E25084C-0BFE-4B25-903D-AE10221A0929/0/W25X40CL.pdf)
 SPIFlash::SPIFlash(uint8_t slaveSelectPin, uint16_t jedecID) {
   _slaveSelectPin = slaveSelectPin;
   _jedecID = jedecID;
