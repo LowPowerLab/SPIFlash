@@ -324,7 +324,7 @@ byte validateHEXData(void* data, byte length)
 }
 
 //returns the final size of the buf
-byte prepareSendBuffer(char* hexdata, byte*buf, byte length, byte seq)
+byte prepareSendBuffer(char* hexdata, byte*buf, byte length, uint16_t seq)
 {
   byte seqLen = sprintf(((char*)buf), "FLX:%d:", seq);
   for (byte i=0; i<length;i++)
