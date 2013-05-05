@@ -20,7 +20,7 @@
 #endif
 
 #ifndef ACK_TIMEOUT
-  #define ACK_TIMEOUT 50
+  #define ACK_TIMEOUT 20
 #endif
 
 #include <RFM12B.h>
@@ -39,9 +39,9 @@ boolean waitForAck(RFM12B radio, uint16_t ACKTIMEOUT=ACK_TIMEOUT);
 
 byte validateHEXData(void* data, byte length);
 byte prepareSendBuffer(char* hexdata, byte*buf, byte length, uint16_t seq);
-boolean sendHEXPacket(RFM12B radio, byte remoteID, byte* sendBuf, byte hexDataLen, byte seq, uint16_t ACKTIMEOUT=ACK_TIMEOUT, uint16_t TIMEOUT=DEFAULT_TIMEOUT, boolean DEBUG=false);
+boolean sendHEXPacket(RFM12B radio, byte remoteID, byte* sendBuf, byte hexDataLen, uint16_t seq, uint16_t TIMEOUT=DEFAULT_TIMEOUT, uint16_t ACKTIMEOUT=ACK_TIMEOUT, boolean DEBUG=false);
 byte BYTEfromHEX(char MSB, char LSB);
-byte readSerialLine(void* input);
+byte readSerialLine(char* input, char endOfLineChar=10, byte maxLength=64, uint16_t timeout=1000);
 void PrintHex83(byte* data, byte length);
 
 #endif
