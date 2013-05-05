@@ -44,10 +44,9 @@ void CheckForWirelessHEX(RFM12B radio, SPIFlash flash, boolean DEBUG)
 }
 
 boolean HandleWirelessHEXData(RFM12B radio, byte remoteID, SPIFlash flash, boolean DEBUG) {
-  int seq=0;
   uint8_t c;
   long now=0;
-  int tmp,len;
+  uint16_t tmp,seq=0,len;
   char buffer[16];
   int timeout = 3000; //3s for flash data
   uint16_t bytesFlashed=10;
@@ -72,7 +71,7 @@ boolean HandleWirelessHEXData(RFM12B radio, byte remoteID, SPIFlash flash, boole
         if (radio.Data[3]==':' && dataLen >= 7) //FLX:_:_
         {
           byte index=3;
-          int tmp = 0;
+          tmp = 0;
           
           //read packet SEQ
           for (byte i = 4; i<8; i++) //up to 4 characters for seq number
@@ -104,7 +103,7 @@ boolean HandleWirelessHEXData(RFM12B radio, byte remoteID, SPIFlash flash, boole
               flash.writeByte(bytesFlashed++, radio.Data[i]);
 
             //send ACK
-            tmp = sprintf(buffer, "FLX:%d:OK", tmp);
+            tmp = sprintf(buffer, "FLX:%u:OK", tmp);
             if (DEBUG) Serial.println((char*)buffer);
             radio.SendACK(buffer, tmp);
             seq++;
@@ -149,23 +148,17 @@ boolean HandleWirelessHEXData(RFM12B radio, byte remoteID, SPIFlash flash, boole
   }
 }
 
-
-//returns # of bytes read, up to 64
-byte readSerialLine(void* input)
+// reads a line feed (\n) terminated line from the serial stream
+// returns # of bytes read, up to 255
+// timeout in ms, will timeout and return after so long
+byte readSerialLine(char* input, char endOfLineChar, byte maxLength, uint16_t timeout)
 {
-  //char c;
   byte inputLen = 0;
-  if (Serial.available())
-  {
-    do {
-      //c = Serial.read();
-      //if (c>=32 && c<=126) //only human readable ASCII
-      ((byte*)input)[inputLen++]=Serial.read();
-      delay(2); //need it otherwise serial stream can get truncated
-    }
-    while(Serial.available());
-    ((byte*)input)[inputLen]=0;
-  }
+  Serial.setTimeout(timeout);
+  inputLen = Serial.readBytesUntil(endOfLineChar, input, maxLength);
+  input[inputLen]=0;//null-terminate it
+  Serial.setTimeout(0);
+  //Serial.println();
   return inputLen;
 }
 
@@ -256,9 +249,9 @@ boolean HandleSerialHEXData(RFM12B radio, byte targetID, uint16_t TIMEOUT, uint1
               //Serial.print("PREP ");Serial.print(sendBufLen); Serial.print(" > "); PrintHex83(sendBuf, sendBufLen);
               
               //SEND RADIO DATA
-              if (sendHEXPacket(radio, remoteID, sendBuf, sendBufLen, seq, DEBUG))
+              if (sendHEXPacket(radio, remoteID, sendBuf, sendBufLen, seq, TIMEOUT, ACKTIMEOUT, DEBUG))
               {
-                sprintf((char*)sendBuf, "FLX:%d:OK",seq);
+                sprintf((char*)sendBuf, "FLX:%u:OK",seq);
                 Serial.println((char*)sendBuf); //response to host (python?)
                 seq++;
               }
@@ -326,7 +319,7 @@ byte validateHEXData(void* data, byte length)
 //returns the final size of the buf
 byte prepareSendBuffer(char* hexdata, byte*buf, byte length, uint16_t seq)
 {
-  byte seqLen = sprintf(((char*)buf), "FLX:%d:", seq);
+  byte seqLen = sprintf(((char*)buf), "FLX:%u:", seq);
   for (byte i=0; i<length;i++)
     buf[seqLen+i] = BYTEfromHEX(hexdata[i*2], hexdata[i*2+1]);
   return seqLen+length;
@@ -339,11 +332,11 @@ byte BYTEfromHEX(char MSB, char LSB)
 }
 
 //return the SEQ of the ACK received, or -1 if invalid
-boolean sendHEXPacket(RFM12B radio, byte targetID, byte* sendBuf, byte hexDataLen, byte seq, uint16_t TIMEOUT, uint16_t ACKTIMEOUT, boolean DEBUG)
+boolean sendHEXPacket(RFM12B radio, byte targetID, byte* sendBuf, byte hexDataLen, uint16_t seq, uint16_t TIMEOUT, uint16_t ACKTIMEOUT, boolean DEBUG)
 {
   long now = millis();
   
-  while(1){
+  while(1) {
     if (DEBUG) { Serial.print("RFTX > "); PrintHex83(sendBuf, hexDataLen); }
     radio.Send(targetID, sendBuf, hexDataLen, true);
     
@@ -357,8 +350,8 @@ boolean sendHEXPacket(RFM12B radio, byte targetID, byte* sendBuf, byte hexDataLe
           radio.Data[3]==':' && radio.Data[ackLen-3]==':' &&
           radio.Data[ackLen-2]=='O' && radio.Data[ackLen-1]=='K')
       {
-        int tmp=0;
-        sscanf((const char*)radio.Data, "FLX:%d:OK", &tmp);
+        uint16_t tmp=0;
+        sscanf((const char*)radio.Data, "FLX:%u:OK", &tmp);
         return tmp == seq;
       }
     }
