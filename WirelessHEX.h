@@ -38,7 +38,7 @@ boolean HandleSerialHEXData(RFM12B radio, byte targetID, uint16_t TIMEOUT=DEFAUL
 boolean waitForAck(RFM12B radio, uint16_t ACKTIMEOUT=ACK_TIMEOUT);
 
 byte validateHEXData(void* data, byte length);
-byte prepareSendBuffer(char* hexdata, byte*buf, byte length, byte seq);
+byte prepareSendBuffer(char* hexdata, byte*buf, byte length, uint16_t seq);
 boolean sendHEXPacket(RFM12B radio, byte remoteID, byte* sendBuf, byte hexDataLen, byte seq, uint16_t ACKTIMEOUT=ACK_TIMEOUT, uint16_t TIMEOUT=DEFAULT_TIMEOUT, boolean DEBUG=false);
 byte BYTEfromHEX(char MSB, char LSB);
 byte readSerialLine(void* input);
