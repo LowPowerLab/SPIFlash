@@ -89,6 +89,10 @@ void SPIFlash::readBytes(long addr, void* buf, word len) {
 
 /// Send a command to the flash chip, pass TRUE for isWrite when its a write command
 void SPIFlash::command(byte cmd, boolean isWrite){
+#if defined(__AVR_ATmega32U4__) // Arduino Leonardo, MoteinoLeo
+  DDRB |= B00000001;            // Make sure the SS pin (PB0 - used by RFM12B on MoteinoLeo R1) is set as output HIGH!
+  PORTB |= B00000001;
+#endif
   if (isWrite)
   {
     command(SPIFLASH_WRITEENABLE); // Write Enable
