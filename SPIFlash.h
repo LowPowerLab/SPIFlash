@@ -24,23 +24,28 @@
 
 #include <SPI.h>
 
+/// IMPORTANT: NAND FLASH memory requires erase before write, because
+///            it can only transition from 1s to 0s and only the erase command can reset all 0s to 1s
+/// See http://en.wikipedia.org/wiki/Flash_memory
+/// The smallest range that can be erased is a sector (4K, 32K, 64K); there is also a chip erase command
+
 /// Standard SPI flash commands
 /// Assuming the WP pin is pulled up (to disable hardware write protection)
 /// To use any write commands the WEL bit in the status register must be set to 1.
 /// This is accomplished by sending a 0x06 command before any such write/erase command.
-/// The WEL bit in the status register resets to the logical ‚Äú0‚Äù state after a
-/// device power-up or reset. In addition, the WEL bit will be reset to the logical ‚Äú0‚Äù state automatically under the following conditions:
-/// ‚Ä¢ Write Disable operation completes successfully
-/// ‚Ä¢ Write Status Register operation completes successfully or aborts
-/// ‚Ä¢ Protect Sector operation completes successfully or aborts
-/// ‚Ä¢ Unprotect Sector operation completes successfully or aborts
-/// ‚Ä¢ Byte/Page Program operation completes successfully or aborts
-/// ‚Ä¢ Sequential Program Mode reaches highest unprotected memory location
-/// ‚Ä¢ Sequential Program Mode reaches the end of the memory array
-/// ‚Ä¢ Sequential Program Mode aborts
-/// ‚Ä¢ Block Erase operation completes successfully or aborts
-/// ‚Ä¢ Chip Erase operation completes successfully or aborts
-/// ‚Ä¢ Hold condition aborts
+/// The WEL bit in the status register resets to the logical ì0î state after a
+/// device power-up or reset. In addition, the WEL bit will be reset to the logical ì0î state automatically under the following conditions:
+/// ï Write Disable operation completes successfully
+/// ï Write Status Register operation completes successfully or aborts
+/// ï Protect Sector operation completes successfully or aborts
+/// ï Unprotect Sector operation completes successfully or aborts
+/// ï Byte/Page Program operation completes successfully or aborts
+/// ï Sequential Program Mode reaches highest unprotected memory location
+/// ï Sequential Program Mode reaches the end of the memory array
+/// ï Sequential Program Mode aborts
+/// ï Block Erase operation completes successfully or aborts
+/// ï Chip Erase operation completes successfully or aborts
+/// ï Hold condition aborts
 #define SPIFLASH_WRITEENABLE      0x06        // write enable
 #define SPIFLASH_WRITEDISABLE     0x04        // write disable
 
@@ -76,6 +81,8 @@ public:
   void blockErase4K(long address);
   void blockErase32K(long address);
   word readDeviceId();
+  void sleep();
+  void wakeup();
   void end();
 protected:
   void select();

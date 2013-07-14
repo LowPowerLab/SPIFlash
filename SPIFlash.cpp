@@ -14,6 +14,11 @@
 
 #include <SPIFlash.h>
 
+/// IMPORTANT: NAND FLASH memory requires erase before write, because
+///            it can only transition from 1s to 0s and only the erase command can reset all 0s to 1s
+/// See http://en.wikipedia.org/wiki/Flash_memory
+/// The smallest range that can be erased is a sector (4K, 32K, 64K); there is also a chip erase command
+
 /// Constructor. JedecID is optional but recommended, since this will ensure that the device is present and has a valid response
 /// get this from the datasheet of your flash chip
 /// Example for Atmel-Adesto 4Mbit AT25DF041A: 0x1F44 (page 27: http://www.adestotech.com/sites/default/files/datasheets/doc3668.pdf)
@@ -181,6 +186,16 @@ void SPIFlash::blockErase32K(long addr) {
   SPI.transfer(addr >> 16);
   SPI.transfer(addr >> 8);
   SPI.transfer(addr);
+  unselect();
+}
+
+void SPIFlash::sleep() {
+  command(SPIFLASH_SLEEP); // Block Erase
+  unselect();
+}
+
+void SPIFlash::wakeup() {
+  command(SPIFLASH_WAKE); // Block Erase
   unselect();
 }
 
