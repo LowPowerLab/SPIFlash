@@ -62,7 +62,9 @@ boolean SPIFlash::initialize()
 /// Get the manufacturer and device ID bytes (as a short word)
 word SPIFlash::readDeviceId()
 {
-  command(SPIFLASH_IDREAD); // Read JEDEC ID
+  //command(SPIFLASH_IDREAD); // Read JEDEC ID
+  select();
+  SPI.transfer(SPIFLASH_IDREAD);
   word jedecid = SPI.transfer(0) << 8;
   jedecid |= SPI.transfer(0);
   unselect();
