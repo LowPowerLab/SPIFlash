@@ -62,9 +62,12 @@ boolean SPIFlash::initialize()
 /// Get the manufacturer and device ID bytes (as a short word)
 word SPIFlash::readDeviceId()
 {
-  //command(SPIFLASH_IDREAD); // Read JEDEC ID
+#if defined(__AVR_ATmega32U4__) // Arduino Leonardo, MoteinoLeo
+  command(SPIFLASH_IDREAD); // Read JEDEC ID
+#else
   select();
   SPI.transfer(SPIFLASH_IDREAD);
+#endif
   word jedecid = SPI.transfer(0) << 8;
   jedecid |= SPI.transfer(0);
   unselect();
