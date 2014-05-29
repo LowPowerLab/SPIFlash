@@ -14,6 +14,8 @@
 
 #include <SPIFlash.h>
 
+byte SPIFlash::UNIQUEID[8];
+
 /// IMPORTANT: NAND FLASH memory requires erase before write, because
 ///            it can only transition from 1s to 0s and only the erase command can reset all 0s to 1s
 /// See http://en.wikipedia.org/wiki/Flash_memory
@@ -72,6 +74,25 @@ word SPIFlash::readDeviceId()
   jedecid |= SPI.transfer(0);
   unselect();
   return jedecid;
+}
+
+/// Get the 64 bit unique identifier, stores it in UNIQUEID[8]. Only needs to be called once, ie after initialize
+/// Returns the byte pointer to the UNIQUEID byte array
+/// Read UNIQUEID like this:
+/// flash.readUniqueId(); for (byte i=0;i<8;i++) { Serial.print(flash.UNIQUEID[i], HEX); Serial.print(' '); }
+/// or like this:
+/// flash.readUniqueId(); byte* MAC = flash.readUniqueId(); for (byte i=0;i<8;i++) { Serial.print(MAC[i], HEX); Serial.print(' '); }
+byte* SPIFlash::readUniqueId()
+{
+  command(SPIFLASH_MACREAD);
+  SPI.transfer(0);
+  SPI.transfer(0);
+  SPI.transfer(0);
+  SPI.transfer(0);
+  for (byte i=0;i<8;i++)
+    UNIQUEID[i] = SPI.transfer(0);
+  unselect();
+  return UNIQUEID;
 }
 
 /// read 1 byte from flash memory

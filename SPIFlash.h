@@ -65,9 +65,11 @@
 #define SPIFLASH_IDREAD           0x9F        // read JEDEC manufacturer and device ID (2 bytes, specific bytes for each manufacturer and device)
                                               // Example for Atmel-Adesto 4Mbit AT25DF041A: 0x1F44 (page 27: http://www.adestotech.com/sites/default/files/datasheets/doc3668.pdf)
                                               // Example for Winbond 4Mbit W25X40CL: 0xEF30 (page 14: http://www.winbond.com/NR/rdonlyres/6E25084C-0BFE-4B25-903D-AE10221A0929/0/W25X40CL.pdf)
-
+#define SPIFLASH_MACREAD          0x4B        // read unique ID number (MAC)
+                                              
 class SPIFlash {
 public:
+  static byte UNIQUEID[8];
   SPIFlash(byte slaveSelectPin, uint16_t jedecID=0);
   boolean initialize();
   void command(byte cmd, boolean isWrite=false);
@@ -81,6 +83,8 @@ public:
   void blockErase4K(long address);
   void blockErase32K(long address);
   word readDeviceId();
+  byte* readUniqueId();
+  
   void sleep();
   void wakeup();
   void end();
