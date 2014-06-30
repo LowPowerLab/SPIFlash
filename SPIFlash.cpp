@@ -195,7 +195,6 @@ void SPIFlash::writeBytes(long addr, const void* buf, uint16_t len) {
     SPI.transfer(((byte*) buf)[i]);
   }
   unselect();
-  delay(3);
 }
 
 /// erase entire flash memory array
