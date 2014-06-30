@@ -77,7 +77,7 @@ public:
   byte readByte(long addr);
   void readBytes(long addr, void* buf, word len);
   void writeByte(long addr, byte byt);
-  void writeBytes(long addr, const void* buf, byte len);
+  void writeBytes(long addr, const void* buf, uint16_t len);
   boolean busy();
   void chipErase();
   void blockErase4K(long address);

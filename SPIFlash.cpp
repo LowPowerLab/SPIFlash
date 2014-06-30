@@ -176,12 +176,12 @@ void SPIFlash::writeByte(long addr, uint8_t byt) {
 /// WARNING: if you write beyond a page boundary (or more than 256bytes),
 ///          the bytes will wrap around and start overwriting at the beginning of that same page
 ///          see datasheet for more details
-void SPIFlash::writeBytes(long addr, const void* buf, uint8_t len) {
+void SPIFlash::writeBytes(long addr, const void* buf, uint16_t len) {
   command(SPIFLASH_BYTEPAGEPROGRAM, true);  // Byte/Page Program
   SPI.transfer(addr >> 16);
   SPI.transfer(addr >> 8);
   SPI.transfer(addr);
-  for (uint8_t i = 0; i < len; i++)
+  for (uint16_t i = 0; i < len; i++)
     SPI.transfer(((byte*) buf)[i]);
   unselect();
 }
