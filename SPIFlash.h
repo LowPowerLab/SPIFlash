@@ -66,18 +66,19 @@
                                               // Example for Atmel-Adesto 4Mbit AT25DF041A: 0x1F44 (page 27: http://www.adestotech.com/sites/default/files/datasheets/doc3668.pdf)
                                               // Example for Winbond 4Mbit W25X40CL: 0xEF30 (page 14: http://www.winbond.com/NR/rdonlyres/6E25084C-0BFE-4B25-903D-AE10221A0929/0/W25X40CL.pdf)
 #define SPIFLASH_MACREAD          0x4B        // read unique ID number (MAC)
-                                              
+#define SPIFLASH_T_RES_1_US       3
+                         
 class SPIFlash {
 public:
   static byte UNIQUEID[8];
   SPIFlash(byte slaveSelectPin, uint16_t jedecID=0);
   boolean initialize();
-  void command(byte cmd, boolean isWrite=false);
+  void command(byte cmd, boolean isWrite=false, boolean busyWait=true);
   byte readStatus();
   byte readByte(long addr);
   void readBytes(long addr, void* buf, word len);
   void writeByte(long addr, byte byt);
-  void writeBytes(long addr, const void* buf, uint16_t len);
+  void writeBytes(long addr, const void* buf, uint16_t len); // len must be between 1-256
   boolean busy();
   void chipErase();
   void blockErase4K(long address);
@@ -90,7 +91,7 @@ public:
   void end();
 protected:
   void select();
-  void unselect();
+  void unselect(int us = 0);
   byte _slaveSelectPin;
   uint16_t _jedecID;
 };

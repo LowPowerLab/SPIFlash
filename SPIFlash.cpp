@@ -37,10 +37,15 @@ void SPIFlash::select() {
 }
 
 /// UNselect the flash chip
-void SPIFlash::unselect() {
+void SPIFlash::unselect(int us) {
   digitalWrite(_slaveSelectPin, HIGH);
+  if (us > 0) {
+    delayMicroseconds(us);
+  }
   interrupts();
 }
+
+
 
 /// setup SPI, read device ID etc...
 boolean SPIFlash::initialize()
@@ -119,7 +124,7 @@ void SPIFlash::readBytes(long addr, void* buf, word len) {
 }
 
 /// Send a command to the flash chip, pass TRUE for isWrite when its a write command
-void SPIFlash::command(byte cmd, boolean isWrite){
+void SPIFlash::command(byte cmd, boolean isWrite, boolean busyWait){
 #if defined(__AVR_ATmega32U4__) // Arduino Leonardo, MoteinoLeo
   DDRB |= B00000001;            // Make sure the SS pin (PB0 - used by RFM12B on MoteinoLeo R1) is set as output HIGH!
   PORTB |= B00000001;
@@ -129,8 +134,13 @@ void SPIFlash::command(byte cmd, boolean isWrite){
     command(SPIFLASH_WRITEENABLE); // Write Enable
     unselect();
   }
-  while(busy()); //wait for any write/erase to complete
+
+  if (busyWait) {
+    while(busy()); //wait for any write/erase to complete
+  }
+
   select();
+
   SPI.transfer(cmd);
 }
 
@@ -216,13 +226,18 @@ void SPIFlash::blockErase32K(long addr) {
 }
 
 void SPIFlash::sleep() {
-  command(SPIFLASH_SLEEP); // Block Erase
+  command(SPIFLASH_SLEEP); // SLEEP
   unselect();
 }
 
 void SPIFlash::wakeup() {
-  command(SPIFLASH_WAKE); // Block Erase
-  unselect();
+  // not a write command
+  // do not wait for non-busy status because only SPIFLASH_WAKE command is accepted by the chip
+  // when in sleep mode
+  command(SPIFLASH_WAKE, false, false); 
+
+  // drive pin high for TRES1 microseconds
+  unselect(SPIFLASH_T_RES_1_US);
 }
 
 /// cleanup
