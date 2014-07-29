@@ -93,6 +93,8 @@ protected:
   void unselect();
   byte _slaveSelectPin;
   uint16_t _jedecID;
+  byte _SPCR;
+  byte _SPSR;
 };
 
 #endif
