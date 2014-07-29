@@ -32,24 +32,36 @@ SPIFlash::SPIFlash(uint8_t slaveSelectPin, uint16_t jedecID) {
 
 /// Select the flash chip
 void SPIFlash::select() {
+#ifdef SPI_HAS_TRANSACTION
+  SPI.beginTransaction(SPISettings(33000000, MSBFIRST, SPI_MODE0));
+#else
   noInterrupts();
+#endif
   digitalWrite(_slaveSelectPin, LOW);
 }
 
 /// UNselect the flash chip
 void SPIFlash::unselect() {
   digitalWrite(_slaveSelectPin, HIGH);
+#ifdef SPI_HAS_TRANSACTION
+  SPI.endTransaction();
+#else
   interrupts();
+#endif
 }
 
 /// setup SPI, read device ID etc...
 boolean SPIFlash::initialize()
 {
   pinMode(_slaveSelectPin, OUTPUT);
+#ifdef SPI_HAS_TRANSACTION
+  digitalWrite(_slaveSelectPin, HIGH);
+#else
   unselect();
   SPI.setDataMode(SPI_MODE0);
   SPI.setBitOrder(MSBFIRST);
   SPI.setClockDivider(SPI_CLOCK_DIV2); //max speed, except on Due which can run at system clock speed
+#endif
   SPI.begin();
 
   if (_jedecID == 0 || readDeviceId() == _jedecID) {
