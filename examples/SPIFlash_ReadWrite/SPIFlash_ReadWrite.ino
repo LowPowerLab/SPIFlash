@@ -17,9 +17,7 @@
 // Get the SPIFlash library from here: https://github.com/LowPowerLab/SPIFlash
 
 #include <SPIFlash.h>
-#include <RFM12B.h>
 #include <SPI.h>
-#include <avr/wdt.h>
 
 #define SERIAL_BAUD      115200
 char input = 0;
