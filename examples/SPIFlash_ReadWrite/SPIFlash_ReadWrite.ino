@@ -1,12 +1,4 @@
-/*
- * Copyright (c) 2013 by Felix Rusu <felix@lowpowerlab.com>
- *
- * This file is free software; you can redistribute it and/or modify
- * it under the terms of either the GNU General Public License version 2
- * or the GNU Lesser General Public License version 2.1, both as
- * published by the Free Software Foundation.
- */
-
+// **********************************************************************************
 // This sketch is an example of using the SPIFlash library with a Moteino
 // that has an onboard SPI Flash chip. This sketch listens to a few serial commands
 // Hence type the following commands to interact with the SPI flash memory array:
@@ -15,13 +7,50 @@
 // - 'i' print manufacturer/device ID
 // - [0-9] writes a random byte to addresses [0-9] (either 0xAA or 0xBB)
 // Get the SPIFlash library from here: https://github.com/LowPowerLab/SPIFlash
+// **********************************************************************************
+// Copyright Felix Rusu, LowPowerLab.com
+// Library and code by Felix Rusu - felix@lowpowerlab.com
+// **********************************************************************************
+// License
+// **********************************************************************************
+// This program is free software; you can redistribute it 
+// and/or modify it under the terms of the GNU General    
+// Public License as published by the Free Software       
+// Foundation; either version 3 of the License, or        
+// (at your option) any later version.                    
+//                                                        
+// This program is distributed in the hope that it will   
+// be useful, but WITHOUT ANY WARRANTY; without even the  
+// implied warranty of MERCHANTABILITY or FITNESS FOR A   
+// PARTICULAR PURPOSE. See the GNU General Public        
+// License for more details.                              
+//                                                        
+// You should have received a copy of the GNU General    
+// Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+//                                                        
+// Licence can be viewed at                               
+// http://www.gnu.org/licenses/gpl-3.0.txt
+//
+// Please maintain this license information along with authorship
+// and copyright notices in any redistribution of this code
+// **********************************************************************************
 
-#include <SPIFlash.h>
+
+#include <SPIFlash.h>    //get it here: https://github.com/LowPowerLab/SPIFlash
 #include <SPI.h>
 
 #define SERIAL_BAUD      115200
 char input = 0;
 long lastPeriod = -1;
+
+#ifdef __AVR_ATmega1284P__
+  #define LED           15 // Moteino MEGAs have LEDs on D15
+  #define FLASH_SS      23 // and FLASH SS on D23
+#else
+  #define LED           9 // Moteinos have LEDs on D9
+  #define FLASH_SS      8 // and FLASH SS on D8
+#endif
 
 //////////////////////////////////////////
 // flash(SPI_CS, MANUFACTURER_ID)
@@ -29,7 +58,7 @@ long lastPeriod = -1;
 // MANUFACTURER_ID - OPTIONAL, 0x1F44 for adesto(ex atmel) 4mbit flash
 //                             0xEF30 for windbond 4mbit flash
 //////////////////////////////////////////
-SPIFlash flash(8, 0xEF30);
+SPIFlash flash(FLASH_SS, 0xEF30);
 
 void setup(){
   Serial.begin(SERIAL_BAUD);
