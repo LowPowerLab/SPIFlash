@@ -139,7 +139,12 @@ void SPIFlash::command(byte cmd, boolean isWrite){
     command(SPIFLASH_WRITEENABLE); // Write Enable
     unselect();
   }
-  while(busy()); //wait for any write/erase to complete
+  //wait for any write/erase to complete
+  //  a time limit cannot really be added here without it being a very large safe limit
+  //  that is because some chips can take several seconds to carry out a chip erase or other similar multi block or entire-chip operations
+  //  a recommended alternative to such situations where chip can be or not be present is to add a 10k or similar weak pulldown on the
+  //  open drain MISO input which can read noise/static and hence return a non 0 status byte, causing the while() to hang when a flash chip is not present
+  while(busy());
   select();
   SPI.transfer(cmd);
 }
