@@ -6,6 +6,8 @@
  * Minimal modifications should allow chips that have different page size but modifications
  * DEPENDS ON: Arduino SPI library
  *
+ * Updated Jan. 5, 2015, TomWS1, modified writeBytes to allow blocks > 256 bytes and handle page misalignment.
+ *
  * This file is free software; you can redistribute it and/or modify
  * it under the terms of either the GNU General Public License version 2
  * or the GNU Lesser General Public License version 2.1, both as
@@ -185,20 +187,31 @@ void SPIFlash::writeByte(long addr, uint8_t byt) {
   unselect();
 }
 
-/// write 1-256 bytes to flash memory
+/// write multiple bytes to flash memory (up to 64K)
 /// WARNING: you can only write to previously erased memory locations (see datasheet)
 ///          use the block erase commands to first clear memory (write 0xFFs)
-/// WARNING: if you write beyond a page boundary (or more than 256bytes),
-///          the bytes will wrap around and start overwriting at the beginning of that same page
-///          see datasheet for more details
+/// This version handles both page alignment and data blocks larger than 256 bytes.
+///
 void SPIFlash::writeBytes(long addr, const void* buf, uint16_t len) {
-  command(SPIFLASH_BYTEPAGEPROGRAM, true);  // Byte/Page Program
-  SPI.transfer(addr >> 16);
-  SPI.transfer(addr >> 8);
-  SPI.transfer(addr);
-  for (uint16_t i = 0; i < len; i++)
-    SPI.transfer(((byte*) buf)[i]);
-  unselect();
+  int n;
+  int maxBytes = 256-(addr%256);  // force the first set of bytes to stay within the first page
+  while (len>0)
+  {
+    n = (len<=maxBytes) ? len : maxBytes;
+  
+    command(SPIFLASH_BYTEPAGEPROGRAM, true);  // Byte/Page Program
+    SPI.transfer(addr >> 16);
+    SPI.transfer(addr >> 8);
+    SPI.transfer(addr);
+    for (uint16_t i = 0; i < n; i++)
+      SPI.transfer(((byte*) buf)[i]);
+    unselect();
+    
+    addr+=n;  // adjust the addresses and remaining bytes by what we've just transferred.
+    buf +=n;
+    len -= n;
+    maxBytes = 256;   // now we can do up to 256 bytes per loop
+  }
 }
 
 /// erase entire flash memory array
