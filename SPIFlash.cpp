@@ -193,22 +193,23 @@ void SPIFlash::writeByte(long addr, uint8_t byt) {
 /// This version handles both page alignment and data blocks larger than 256 bytes.
 ///
 void SPIFlash::writeBytes(long addr, const void* buf, uint16_t len) {
-  int n;
-  int maxBytes = 256-(addr%256);  // force the first set of bytes to stay within the first page
+  uint16_t n;
+  uint16_t maxBytes = 256-(addr%256);  // force the first set of bytes to stay within the first page
+  uint16_t offset = 0;
   while (len>0)
   {
     n = (len<=maxBytes) ? len : maxBytes;
-  
     command(SPIFLASH_BYTEPAGEPROGRAM, true);  // Byte/Page Program
     SPI.transfer(addr >> 16);
     SPI.transfer(addr >> 8);
     SPI.transfer(addr);
+    
     for (uint16_t i = 0; i < n; i++)
-      SPI.transfer(((byte*) buf)[i]);
+      SPI.transfer(((byte*) buf)[offset + i]);
     unselect();
     
     addr+=n;  // adjust the addresses and remaining bytes by what we've just transferred.
-    buf +=n;
+    offset +=n;
     len -= n;
     maxBytes = 256;   // now we can do up to 256 bytes per loop
   }
