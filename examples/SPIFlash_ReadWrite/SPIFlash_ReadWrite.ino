@@ -110,7 +110,7 @@ void loop(){
   if ((int)(millis()/500) > lastPeriod)
   {
     lastPeriod++;
-    pinMode(9, OUTPUT);
-    digitalWrite(9, lastPeriod%2);
+    pinMode(LED, OUTPUT);
+    digitalWrite(LED, lastPeriod%2);
   }
 }
