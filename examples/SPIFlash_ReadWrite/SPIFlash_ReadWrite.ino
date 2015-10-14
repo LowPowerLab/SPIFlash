@@ -65,9 +65,14 @@ void setup(){
   Serial.print("Start...");
 
   if (flash.initialize())
+  {
     Serial.println("Init OK!");
+    Blink(LED, 20, 10);
+  }
   else
     Serial.println("Init FAIL!");
+  
+  delay(1000);
 }
 
 void loop(){
@@ -112,5 +117,17 @@ void loop(){
     lastPeriod++;
     pinMode(LED, OUTPUT);
     digitalWrite(LED, lastPeriod%2);
+  }
+}
+
+void Blink(byte PIN, int DELAY_MS, byte loops)
+{
+  pinMode(PIN, OUTPUT);
+  while (loops--)
+  {
+    digitalWrite(PIN,HIGH);
+    delay(DELAY_MS);
+    digitalWrite(PIN,LOW);
+    delay(DELAY_MS);  
   }
 }
