@@ -8,7 +8,9 @@ For instance a 4MBit (512Kbyte) flash chip will have 2048 pages: 256*2048 = 5242
 <br/>DEPENDS ON: Arduino *SPI library*.
 <br/>
 This library was primarily developed to enable **safe** wireless programming on Moteino nodes and Moteino based applications such as the SwitchMote. This has been documented at [lowpowerlab](http://lowpowerlab.com/blog/category/moteino/wireless-programming/). [Dualoptiboot](https://github.com/LowPowerLab/DualOptiboot) (all Moteinos come with it) and [WirelessProgramming library](https://github.com/LowPowerLab/WirelessProgramming) are required to be able to wirelessly re-flash a remote Moteino.
- 
+
+This fork is for Spansion 32Mbit S25FL032P support.
+
 ###Installation
 Copy the content of this library in the "Arduino/libraries/SPIFlash" folder.
 <br />

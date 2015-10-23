@@ -57,6 +57,7 @@ long lastPeriod = -1;
 // SPI_CS          - CS pin attached to SPI flash chip (8 in case of Moteino)
 // MANUFACTURER_ID - OPTIONAL, 0x1F44 for adesto(ex atmel) 4mbit flash
 //                             0xEF30 for windbond 4mbit flash
+//							   0x0102 for Spansion 32mbit S25FL032P flash
 //////////////////////////////////////////
 SPIFlash flash(FLASH_SS, 0xEF30);
 

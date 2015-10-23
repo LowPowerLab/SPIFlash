@@ -45,6 +45,7 @@ uint8_t SPIFlash::UNIQUEID[8];
 /// get this from the datasheet of your flash chip
 /// Example for Atmel-Adesto 4Mbit AT25DF041A: 0x1F44 (page 27: http://www.adestotech.com/sites/default/files/datasheets/doc3668.pdf)
 /// Example for Winbond 4Mbit W25X40CL: 0xEF30 (page 14: http://www.winbond.com/NR/rdonlyres/6E25084C-0BFE-4B25-903D-AE10221A0929/0/W25X40CL.pdf)
+/// Example for Spansion 32Mbit S25FL032P: 0x0102 (page 32: https://www.spansion.com/Support/Datasheets/S25FL032P_00.pdf)
 SPIFlash::SPIFlash(uint8_t slaveSelectPin, uint16_t jedecID) {
   _slaveSelectPin = slaveSelectPin;
   _jedecID = jedecID;
@@ -270,12 +271,25 @@ void SPIFlash::blockErase4K(uint32_t addr) {
 
 /// erase a 32Kbyte block
 void SPIFlash::blockErase32K(uint32_t addr) {
+   if (readDeviceId() == 0x0102)  // check if Spansion S25FL032P 
+      blockErase64K(addr); // Spansion S25FL032P Flash does not have a 32KErase
+  else
   command(SPIFLASH_BLOCKERASE_32K, true); // Block Erase
   SPI.transfer(addr >> 16);
   SPI.transfer(addr >> 8);
   SPI.transfer(addr);
   unselect();
 }
+
+/// erase a 64Kbyte block
+void SPIFlash::blockErase64K(uint32_t addr) {
+   command(SPIFLASH_BLOCKERASE_64K, true); // Block Erase
+   SPI.transfer(addr >> 16);
+   SPI.transfer(addr >> 8);
+   SPI.transfer(addr);
+   unselect();
+}
+
 
 void SPIFlash::sleep() {
   command(SPIFLASH_SLEEP);
