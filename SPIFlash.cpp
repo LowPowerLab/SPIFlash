@@ -277,6 +277,15 @@ void SPIFlash::blockErase32K(uint32_t addr) {
   unselect();
 }
 
+/// erase a 64Kbyte block
+void SPIFlash::blockErase64K(uint32_t addr) {
+  command(SPIFLASH_BLOCKERASE_64K, true); // Block Erase
+  SPI.transfer(addr >> 16);
+  SPI.transfer(addr >> 8);
+  SPI.transfer(addr);
+  unselect();
+}
+
 void SPIFlash::sleep() {
   command(SPIFLASH_SLEEP);
   unselect();

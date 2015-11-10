@@ -102,6 +102,7 @@ public:
   void chipErase();
   void blockErase4K(uint32_t address);
   void blockErase32K(uint32_t address);
+  void blockErase64K(uint32_t addr);
   uint16_t readDeviceId();
   uint8_t* readUniqueId();
   
