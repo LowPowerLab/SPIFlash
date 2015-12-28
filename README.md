@@ -14,7 +14,7 @@ Copy the content of this library in the "Arduino/libraries/SPIFlash" folder.
 <br />
 To find your Arduino folder go to File>Preferences in the Arduino IDE.
 <br/>
-See [this tutorial](hhttps://www.arduino.cc/en/Guide/Libraries) on installing Arduino libraries.
+See [this tutorial](https://www.arduino.cc/en/Guide/Libraries) on installing Arduino libraries.
 
 ###License
 Copyright (c) 2013 by Felix Rusu <felix@lowpowerlab.com>
