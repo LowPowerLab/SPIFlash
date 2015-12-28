@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/LowPowerLab/SPIFlash.svg?branch=master)](https://travis-ci.org/LowPowerLab/SPIFlash)
 SPIFlash
 ========
 Arduino/Moteino library for read/write access to SPI flash memory chips.
@@ -19,7 +18,9 @@ See [this tutorial](http://learn.adafruit.com/arduino-tips-tricks-and-techniques
 
 ###License
 Copyright (c) 2013 by Felix Rusu <felix@lowpowerlab.com>
-<br/>
-This library is free software; you can redistribute it and/or modify it under the terms of either the GNU General Public License version 2 or the GNU Lesser General Public License version 2.1, both as published by the Free Software Foundation.
-<br/>
-This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+<br/><br/>
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+<br/><br/>
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+<br/><br/>
+You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
