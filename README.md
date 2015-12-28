@@ -1,7 +1,7 @@
 SPIFlash
 ========
 Arduino/Moteino library for read/write access to SPI flash memory chips.
-This works with 256byte/page SPI flash memory such as the 4MBIT W25X40CLSNIG used on (Moteinos)[www.moteino.com] for data storage and wireless programming.
+This works with 256byte/page SPI flash memory such as the 4MBIT W25X40CLSNIG used on [Moteino](www.moteino.com) for data storage and wireless programming.
 <br/>
 For instance a 4MBit (512Kbyte) flash chip will have 2048 pages: 256*2048 = 524288 bytes (512Kbytes).
 <br/>Minimal modifications should allow chips that have different page size to work.
@@ -14,7 +14,7 @@ Copy the content of this library in the "Arduino/libraries/SPIFlash" folder.
 <br />
 To find your Arduino folder go to File>Preferences in the Arduino IDE.
 <br/>
-See [this tutorial](http://learn.adafruit.com/arduino-tips-tricks-and-techniques/arduino-libraries) on Arduino libraries.
+See [this tutorial](hhttps://www.arduino.cc/en/Guide/Libraries) on installing Arduino libraries.
 
 ###License
 Copyright (c) 2013 by Felix Rusu <felix@lowpowerlab.com>
