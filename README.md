@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/LowPowerLab/SPIFlash.svg?branch=master)](https://travis-ci.orgLowPowerLab/SPIFlash)
 SPIFlash
 ========
 Arduino/Moteino library for read/write access to SPI flash memory chips.
