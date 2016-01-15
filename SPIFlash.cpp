@@ -109,7 +109,7 @@ boolean SPIFlash::initialize()
 }
 
 /// Get the manufacturer and device ID bytes (as a short word)
-uint16_t SPIFlash::readDeviceId()
+uint32_t SPIFlash::readDeviceId()
 {
 #if defined(__AVR_ATmega32U4__) // Arduino Leonardo, MoteinoLeo
   command(SPIFLASH_IDREAD); // Read JEDEC ID
@@ -117,7 +117,8 @@ uint16_t SPIFlash::readDeviceId()
   select();
   SPI.transfer(SPIFLASH_IDREAD);
 #endif
-  uint16_t jedecid = SPI.transfer(0) << 8;
+  uint32_t jedecid = SPI.transfer(0) << 16;
+  jedecid |= SPI.transfer(0) << 8;
   jedecid |= SPI.transfer(0);
   if (jedecid == 0x7F7F) { // The 0x7F7F signature means it is a Cypress/Ramtron chip, the real ID will follow in additionnal bytes
     _fram_mode = true;

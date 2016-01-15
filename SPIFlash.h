@@ -106,7 +106,7 @@ public:
   void blockErase4K(uint32_t address);
   void blockErase32K(uint32_t address);
   void blockErase64K(uint32_t addr);
-  uint16_t readDeviceId();
+  uint32_t readDeviceId();
   uint8_t* readManufacturerId();
   uint8_t* readUniqueId();
   
