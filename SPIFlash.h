@@ -6,6 +6,7 @@
 // DEPENDS ON: Arduino SPI library
 // > Updated Jan. 5, 2015, TomWS1, modified writeBytes to allow blocks > 256 bytes and handle page misalignment.
 // > Updated Feb. 26, 2015 TomWS1, added support for SPI Transactions (Arduino 1.5.8 and above)
+// > Updated Jan. 15, 2016 Martin ayotte, add readStatus2(), readStatus3(), readManufacturerId(), fix initialize(), readDeviceId() also return Size
 // > Selective merge by Felix after testing in IDE 1.0.6, 1.6.4
 // **********************************************************************************
 // License
