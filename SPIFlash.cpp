@@ -103,6 +103,9 @@ boolean SPIFlash::initialize()
     command(SPIFLASH_STATUSWRITE, true); // Write Status Register
     SPI.transfer(0);                     // Global Unprotect
     unselect();
+    command(SPIFLASH_STATUS3WRITE, true); // Write Status Register
+    SPI.transfer(0);                     // Write Protect scheme to Normal, not to Individual Block Locks
+    unselect();
     return true;
   }
   return false;
@@ -233,6 +236,28 @@ uint8_t SPIFlash::readStatus()
 {
   select();
   SPI.transfer(SPIFLASH_STATUSREAD);
+  uint8_t status = SPI.transfer(0);
+  unselect();
+  return status;
+}
+
+
+/// return the STATUS2 register
+uint8_t SPIFlash::readStatus2()
+{
+  select();
+  SPI.transfer(SPIFLASH_STATUS2READ);
+  uint8_t status = SPI.transfer(0);
+  unselect();
+  return status;
+}
+
+
+/// return the STATUS3 register
+uint8_t SPIFlash::readStatus3()
+{
+  select();
+  SPI.transfer(SPIFLASH_STATUS3READ);
   uint8_t status = SPI.transfer(0);
   unselect();
   return status;

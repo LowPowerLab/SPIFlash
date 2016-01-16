@@ -76,6 +76,10 @@
                                               // but no actual need to wait for completion (instead need to check the status register BUSY bit)
 #define SPIFLASH_STATUSREAD       0x05        // read status register
 #define SPIFLASH_STATUSWRITE      0x01        // write status register
+#define SPIFLASH_STATUS2READ      0x35        // read status2 register
+#define SPIFLASH_STATUS2WRITE     0x31        // write status2 register
+#define SPIFLASH_STATUS3READ      0x15        // read status3 register
+#define SPIFLASH_STATUS3WRITE     0x11        // write status3 register
 #define SPIFLASH_ARRAYREAD        0x0B        // read array (fast, need to add 1 dummy byte after 3 address bytes)
 #define SPIFLASH_ARRAYREADLOWFREQ 0x03        // read array (low frequency)
 
@@ -97,6 +101,8 @@ public:
   boolean initialize();
   void command(uint8_t cmd, boolean isWrite=false);
   uint8_t readStatus();
+  uint8_t readStatus2();
+  uint8_t readStatus3();
   uint8_t readByte(uint32_t addr);
   void readBytes(uint32_t addr, void* buf, uint16_t len);
   void writeByte(uint32_t addr, uint8_t byt);
