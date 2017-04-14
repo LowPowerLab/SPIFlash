@@ -10,14 +10,14 @@ For instance a 4MBit (512Kbyte) flash chip will have 2048 pages: 256*2048 = 5242
 <br/>
 This library was primarily developed to enable **safe** wireless programming on Moteino nodes and Moteino based applications such as the SwitchMote. This has been documented at [lowpowerlab](http://lowpowerlab.com/blog/category/moteino/wireless-programming/). [Dualoptiboot](https://github.com/LowPowerLab/DualOptiboot) (all Moteinos come with it) and [WirelessProgramming library](https://github.com/LowPowerLab/WirelessProgramming) are required to be able to wirelessly re-flash a remote Moteino.
  
-###Installation
+### Installation
 Copy the content of this library in the "Arduino/libraries/SPIFlash" folder.
 <br />
 To find your Arduino folder go to File>Preferences in the Arduino IDE.
 <br/>
 See [this tutorial](https://www.arduino.cc/en/Guide/Libraries) on installing Arduino libraries.
 
-###License
+### License
 Copyright (c) 2013 by Felix Rusu <felix@lowpowerlab.com>
 <br/><br/>
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
