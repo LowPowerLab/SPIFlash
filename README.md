@@ -1,6 +1,11 @@
-[![Build Status](https://travis-ci.org/LowPowerLab/SPIFlash.svg?branch=master)](https://travis-ci.org/LowPowerLab/SPIFlash)
 SPIFlash
 ========
+[![Build Status](https://travis-ci.org/LowPowerLab/SPIFlash.svg?branch=master)](https://travis-ci.org/LowPowerLab/SPIFlash)
+[![GitHub release](https://img.shields.io/github/release/LowPowerLab/SPIFlash.svg)](https://github.com/LowPowerLab/SPIFlash)
+[![GitHub issues](https://img.shields.io/github/issues/LowPowerLab/SPIFlash.svg)](https://github.com/LowPowerLab/SPIFlash/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/LowPowerLab/SPIFlash.svg)](https://github.com/LowPowerLab/SPIFlash/pulls)
+[![license](https://img.shields.io/github/license/LowPowerLab/SPIFlash.svg)](https://github.com/LowPowerLab/SPIFlash/blob/master/LICENSE.txt)
+
 Arduino/Moteino library for read/write access to SPI flash memory chips.
 This works with 256byte/page SPI flash memory such as the [4MBIT W25X40CLSNIG](https://lowpowerlab.com/shop/product/72) used on [Moteino](https://www.moteino.com) for data storage and wireless programming.
 <br/>
