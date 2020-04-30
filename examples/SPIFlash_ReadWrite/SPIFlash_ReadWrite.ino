@@ -7,6 +7,7 @@
 // - 'i' print manufacturer/device ID
 // - [0-9] writes a random byte to addresses [0-9] (either 0xAA or 0xBB)
 // Get the SPIFlash library from here: https://github.com/LowPowerLab/SPIFlash
+// Note: if other SPI devices are present, ensure their CS pins are pulled up or set HIGH
 // **********************************************************************************
 // Copyright Felix Rusu, LowPowerLab.com
 // Library and code by Felix Rusu - felix@lowpowerlab.com
@@ -42,10 +43,12 @@
 char input = 0;
 long lastPeriod = -1;
 
-#ifdef __AVR_ATmega1284P__  
-  #define SS_FLASHMEM     23 // and FLASH SS on D23 
-#else 
-  #define SS_FLASHMEM      8 // and FLASH SS on D8 
+#ifdef __AVR_ATmega1284P__
+  #define LED           15 // Moteino MEGAs have LEDs on D15
+  #define FLASH_SS      23 // and FLASH SS on D23
+#else
+  #define LED           9 // Moteinos have LEDs on D9
+  #define FLASH_SS      8 // and FLASH SS on D8
 #endif
 
 //////////////////////////////////////////
@@ -55,7 +58,7 @@ long lastPeriod = -1;
 //                             0xEF30 for windbond 4mbit flash
 //                             0xEF40 for windbond 64mbit flash
 //////////////////////////////////////////
-SPIFlash flash(SS_FLASHMEM, 0xEF30);
+SPIFlash flash(FLASH_SS, 0xEF30);
 
 void setup(){
   Serial.begin(SERIAL_BAUD);
@@ -64,7 +67,7 @@ void setup(){
   if (flash.initialize())
   {
     Serial.println("Init OK!");
-    Blink(LED_BUILTIN, 20, 10);
+    Blink(LED, 20, 10);
   }
   else
     Serial.println("Init FAIL!");
@@ -112,8 +115,8 @@ void loop(){
   if ((int)(millis()/500) > lastPeriod)
   {
     lastPeriod++;
-    pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, lastPeriod%2);
+    pinMode(LED, OUTPUT);
+    digitalWrite(LED, lastPeriod%2);
   }
 }
 
