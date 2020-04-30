@@ -42,6 +42,12 @@
 char input = 0;
 long lastPeriod = -1;
 
+#ifdef __AVR_ATmega1284P__  
+  #define SS_FLASHMEM     23 // and FLASH SS on D23 
+#else 
+  #define SS_FLASHMEM      8 // and FLASH SS on D8 
+#endif
+
 //////////////////////////////////////////
 // flash(SPI_CS, MANUFACTURER_ID)
 // SPI_CS          - CS pin attached to SPI flash chip (8 in case of Moteino)
