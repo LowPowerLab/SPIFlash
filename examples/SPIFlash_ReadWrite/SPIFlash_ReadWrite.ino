@@ -35,8 +35,6 @@
 // Please maintain this license information along with authorship
 // and copyright notices in any redistribution of this code
 // **********************************************************************************
-
-
 #include <SPIFlash.h>    //get it here: https://github.com/LowPowerLab/SPIFlash
 #include <SPI.h>
 
@@ -44,21 +42,14 @@
 char input = 0;
 long lastPeriod = -1;
 
-#ifdef __AVR_ATmega1284P__
-  #define LED           15 // Moteino MEGAs have LEDs on D15
-  #define FLASH_SS      23 // and FLASH SS on D23
-#else
-  #define LED           9 // Moteinos have LEDs on D9
-  #define FLASH_SS      8 // and FLASH SS on D8
-#endif
-
 //////////////////////////////////////////
 // flash(SPI_CS, MANUFACTURER_ID)
 // SPI_CS          - CS pin attached to SPI flash chip (8 in case of Moteino)
 // MANUFACTURER_ID - OPTIONAL, 0x1F44 for adesto(ex atmel) 4mbit flash
 //                             0xEF30 for windbond 4mbit flash
+//                             0xEF40 for windbond 64mbit flash
 //////////////////////////////////////////
-SPIFlash flash(FLASH_SS, 0xEF30);
+SPIFlash flash(SS_FLASHMEM, 0xEF30);
 
 void setup(){
   Serial.begin(SERIAL_BAUD);
@@ -67,7 +58,7 @@ void setup(){
   if (flash.initialize())
   {
     Serial.println("Init OK!");
-    Blink(LED, 20, 10);
+    Blink(LED_BUILTIN, 20, 10);
   }
   else
     Serial.println("Init FAIL!");
@@ -115,8 +106,8 @@ void loop(){
   if ((int)(millis()/500) > lastPeriod)
   {
     lastPeriod++;
-    pinMode(LED, OUTPUT);
-    digitalWrite(LED, lastPeriod%2);
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, lastPeriod%2);
   }
 }
 
