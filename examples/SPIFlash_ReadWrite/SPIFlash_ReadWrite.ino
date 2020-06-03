@@ -9,7 +9,7 @@
 // Get the SPIFlash library from here: https://github.com/LowPowerLab/SPIFlash
 // Note: if other SPI devices are present, ensure their CS pins are pulled up or set HIGH
 // **********************************************************************************
-// Copyright Felix Rusu, LowPowerLab.com
+// (C) 2020 Felix Rusu, LowPowerLab.com
 // Library and code by Felix Rusu - felix@lowpowerlab.com
 // **********************************************************************************
 // License
@@ -37,19 +37,10 @@
 // and copyright notices in any redistribution of this code
 // **********************************************************************************
 #include <SPIFlash.h>    //get it here: https://github.com/LowPowerLab/SPIFlash
-#include <SPI.h>
 
 #define SERIAL_BAUD      115200
 char input = 0;
 long lastPeriod = -1;
-
-#ifdef __AVR_ATmega1284P__
-  #define LED           15 // Moteino MEGAs have LEDs on D15
-  #define FLASH_SS      23 // and FLASH SS on D23
-#else
-  #define LED           9 // Moteinos have LEDs on D9
-  #define FLASH_SS      8 // and FLASH SS on D8
-#endif
 
 //////////////////////////////////////////
 // flash(SPI_CS, MANUFACTURER_ID)
@@ -58,7 +49,8 @@ long lastPeriod = -1;
 //                             0xEF30 for windbond 4mbit flash
 //                             0xEF40 for windbond 64mbit flash
 //////////////////////////////////////////
-SPIFlash flash(FLASH_SS, 0xEF30);
+uint16_t expectedDeviceID=0xEF30;
+SPIFlash flash(SS_FLASHMEM, expectedDeviceID);
 
 void setup(){
   Serial.begin(SERIAL_BAUD);
@@ -67,11 +59,22 @@ void setup(){
   if (flash.initialize())
   {
     Serial.println("Init OK!");
-    Blink(LED, 20, 10);
+    Blink(20, 10);
   }
-  else
-    Serial.println("Init FAIL!");
-  
+  else {
+    Serial.print("Init FAIL, expectedDeviceID(0x");
+    Serial.print(expectedDeviceID, HEX);
+    Serial.print(") mismatched the read value: 0x");
+    Serial.println(flash.readDeviceId(), HEX);
+  }
+
+  Serial.println("\n************************");
+  Serial.println("Available operations:");
+  Serial.println("'c' - read flash chip's deviceID 10 times to ensure chip is present");
+  Serial.println("'d' - dump first 256 bytes on the chip");
+  Serial.println("'e' - erase entire flash chip");
+  Serial.println("'i' - read deviceID");
+  Serial.println("************************\n");
   delay(1000);
 }
 
@@ -91,6 +94,22 @@ void loop(){
       }
       
       Serial.println();
+    }
+    else if (input == 'c') {
+      Serial.print("Checking chip is present ... ");
+      uint16_t deviceID=0;
+      for (uint8_t i=0;i<10;i++) {
+        uint16_t idNow = flash.readDeviceId();
+        if (idNow==0 || idNow==0xffff || (i>0 && idNow != deviceID)) {
+          deviceID=0;
+          break;
+        }
+        deviceID=idNow;
+      }
+      if (deviceID!=0) {
+        Serial.print("OK, deviceID=0x");Serial.println(deviceID, HEX);
+      }
+      else Serial.println("FAIL, deviceID is inconsistent or 0x0000/0xffff");
     }
     else if (input == 'e')
     {
@@ -115,19 +134,19 @@ void loop(){
   if ((int)(millis()/500) > lastPeriod)
   {
     lastPeriod++;
-    pinMode(LED, OUTPUT);
-    digitalWrite(LED, lastPeriod%2);
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, lastPeriod%2);
   }
 }
 
-void Blink(byte PIN, int DELAY_MS, byte loops)
+void Blink(int DELAY_MS, byte loops)
 {
-  pinMode(PIN, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
   while (loops--)
   {
-    digitalWrite(PIN,HIGH);
+    digitalWrite(LED_BUILTIN,HIGH);
     delay(DELAY_MS);
-    digitalWrite(PIN,LOW);
+    digitalWrite(LED_BUILTIN,LOW);
     delay(DELAY_MS);  
   }
 }
