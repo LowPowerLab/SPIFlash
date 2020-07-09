@@ -1,6 +1,6 @@
 {
   "name": "SPIFlash",
-  "version": "101.1.2",
+  "version": "101.1.3",
   "keywords": "flash, spi",
   "description": "Library for read/write access to SPI flash memory chips",
   "repository":
