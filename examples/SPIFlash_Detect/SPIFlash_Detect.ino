@@ -4,8 +4,8 @@
 #include <SPI.h>
 
 #define SERIAL_ENABLE
-#define BLINK_FAST_DELAY 100
-#define BLINK_SLOW_DELAY 500
+#define BLINK_FAST_DELAY 50
+#define BLINK_SLOW_DELAY 1000
 
 SPIFlash flash(SS_FLASHMEM, 0xEF30); //EF40 for 16mbit windbond chip
 int LEDTIME = 500;
@@ -14,16 +14,20 @@ int LEDTIME = 500;
 void setup() {
 #ifdef SERIAL_ENABLE
   Serial.begin(115200);
-  delay(4000); //wait a bit until SerialMonitor can be opened
+  delay(2000); //wait a bit until SerialMonitor can be opened
 #endif
   pinMode(LED_BUILTIN, OUTPUT);
 
+  //ensure the radio module CS pin is pulled HIGH or it might interfere!
+  pinMode(SS, OUTPUT);
+  digitalWrite(SS, HIGH);
+
+  //ensure FLASH chip is not sleep mode (unresponsive)
+  flash.wakeup();
   if (flash.initialize()) {
     Serial.println("SPI Flash Init OK!");
     LEDTIME = BLINK_SLOW_DELAY;
-  }
-  else
-  {
+  } else {
     Serial.println("SPI Flash Init FAIL! (is chip soldered?)");
     LEDTIME = BLINK_FAST_DELAY;
   }
