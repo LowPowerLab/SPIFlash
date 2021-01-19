@@ -3,7 +3,7 @@
 #include <SPIFlash.h>   //https://github.com/lowpowerlab/spiflash
 #include <SPI.h>
 
-#define SERIAL_ENABLE
+#define SERIAL_BAUD      115200
 #define BLINK_FAST_DELAY 50
 #define BLINK_SLOW_DELAY 1000
 
@@ -12,15 +12,14 @@ int LEDTIME = 500;
 
 // the setup routine runs once when you press reset:
 void setup() {
-#ifdef SERIAL_ENABLE
-  Serial.begin(115200);
-  delay(2000); //wait a bit until SerialMonitor can be opened
+#ifdef SERIAL_BAUD
+  Serial.begin(SERIAL_BAUD);
+  while (!Serial) delay(100); //wait until Serial/monitor is opened
 #endif
   pinMode(LED_BUILTIN, OUTPUT);
 
   //ensure the radio module CS pin is pulled HIGH or it might interfere!
-  pinMode(SS, OUTPUT);
-  digitalWrite(SS, HIGH);
+  pinMode(SS, OUTPUT); digitalWrite(SS, HIGH);
 
   //ensure FLASH chip is not sleep mode (unresponsive)
   flash.wakeup();

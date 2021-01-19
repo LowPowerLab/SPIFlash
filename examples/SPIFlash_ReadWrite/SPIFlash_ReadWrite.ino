@@ -53,8 +53,16 @@ uint16_t expectedDeviceID=0xEF30;
 SPIFlash flash(SS_FLASHMEM, expectedDeviceID);
 
 void setup(){
+#ifdef SERIAL_BAUD
   Serial.begin(SERIAL_BAUD);
+  while (!Serial) delay(100); //wait until Serial/monitor is opened
+#endif
+  pinMode(LED_BUILTIN, OUTPUT);
+
   Serial.print("Start...");
+
+  //ensure the radio module CS pin is pulled HIGH or it might interfere!
+  pinMode(SS, OUTPUT); digitalWrite(SS, HIGH);
 
   if (flash.initialize())
   {
@@ -134,14 +142,12 @@ void loop(){
   if ((int)(millis()/500) > lastPeriod)
   {
     lastPeriod++;
-    pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, lastPeriod%2);
   }
 }
 
 void Blink(int DELAY_MS, byte loops)
 {
-  pinMode(LED_BUILTIN, OUTPUT);
   while (loops--)
   {
     digitalWrite(LED_BUILTIN,HIGH);
