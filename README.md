@@ -1,6 +1,6 @@
 SPIFlash
 ========
-[![Build Status](https://travis-ci.org/LowPowerLab/SPIFlash.svg?branch=master)](https://travis-ci.org/LowPowerLab/SPIFlash)
+[![Build Status](https://travis-ci.com/LowPowerLab/SPIFlash.svg?branch=master)](https://travis-ci.com/LowPowerLab/SPIFlash)
 [![GitHub release](https://img.shields.io/github/release/LowPowerLab/SPIFlash.svg)](https://github.com/LowPowerLab/SPIFlash)
 [![GitHub issues](https://img.shields.io/github/issues/LowPowerLab/SPIFlash.svg)](https://github.com/LowPowerLab/SPIFlash/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/LowPowerLab/SPIFlash.svg)](https://github.com/LowPowerLab/SPIFlash/pulls)
