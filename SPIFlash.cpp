@@ -200,7 +200,11 @@ boolean SPIFlash::busy()
   unselect();
   return status & 1;
   */
-  return readStatus() & 1;
+  if (chipPoweredDown){
+	return 0;
+  } else {
+	return readStatus() & 1;
+  } 
 }
 
 /// return the STATUS register
@@ -294,11 +298,13 @@ void SPIFlash::blockErase64K(uint32_t addr) {
 
 void SPIFlash::sleep() {
   command(SPIFLASH_SLEEP);
+  chipPoweredDown = true;
   unselect();
 }
 
 void SPIFlash::wakeup() {
   command(SPIFLASH_WAKE);
+  chipPoweredDown = false;
   unselect();
 }
 

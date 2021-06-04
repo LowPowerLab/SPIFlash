@@ -116,6 +116,7 @@ protected:
   uint16_t _jedecID;
   uint8_t _SPCR;
   uint8_t _SPSR;
+  bool chipPoweredDown = true;
 #ifdef SPI_HAS_TRANSACTION
   SPISettings _settings;
 #endif
