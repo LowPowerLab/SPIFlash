@@ -292,11 +292,20 @@ void SPIFlash::blockErase64K(uint32_t addr) {
   unselect();
 }
 
+/// Put flash memory chip into power down mode
+/// WARNING: after this command, only the wake and device_id commands are recognized
+/// hence a wakeup() command should be invoked first before further operations
+/// If a MCU soft restart is possible with flash chip left in sleep(), then a wakeup() command
+///   should always be invoked before any other commands to ensure the flash chip was not left in sleep
 void SPIFlash::sleep() {
   command(SPIFLASH_SLEEP);
   unselect();
 }
 
+/// Wake flash memory from power down mode
+/// NOTE: this command is required after a sleep() command is used, or no other commands will be recognized
+/// If a MCU soft restart is possible with flash chip left in sleep(), then a wakeup() command
+///   should always be invoked before any other commands to ensure the flash chip was not left in sleep
 void SPIFlash::wakeup() {
   command(SPIFLASH_WAKE);
   unselect();
