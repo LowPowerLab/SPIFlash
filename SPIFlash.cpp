@@ -38,8 +38,15 @@ uint8_t SPIFlash::UNIQUEID[8];
 
 /// IMPORTANT: NAND FLASH memory requires erase before write, because
 ///            it can only transition from 1s to 0s and only the erase command can reset all 0s to 1s
-/// See http://en.wikipedia.org/wiki/Flash_memory
-/// The smallest range that can be erased is a sector (4K, 32K, 64K); there is also a chip erase command
+///            See http://en.wikipedia.org/wiki/Flash_memory
+///            The smallest range that can be erased is a sector (4K, 32K, 64K); there is also a chip erase command
+
+/// IMPORTANT: When flash chip is powered down, aka sleeping, the only command it will respond to is 
+///            Release Power-down / Device ID (ABh), per section 8.2.19 of the W25X40CL datasheet.
+///            This means after using the sleep() function of this library, wake() must be the first
+///            function called. If other commands are used, the flash chip will ignore the commands. 
+///            The risk is that the code can hang if there is noise/static on the MISO line,
+///            specifically noise/static that would evaluate to HIGH or 1.
 
 /// Constructor. JedecID is optional but recommended, since this will ensure that the device is present and has a valid response
 /// get this from the datasheet of your flash chip
@@ -180,11 +187,14 @@ void SPIFlash::command(uint8_t cmd, boolean isWrite){
     command(SPIFLASH_WRITEENABLE); // Write Enable
     unselect();
   }
-  //wait for any write/erase to complete
+  //  wait for any write/erase to complete
   //  a time limit cannot really be added here without it being a very large safe limit
   //  that is because some chips can take several seconds to carry out a chip erase or other similar multi block or entire-chip operations
-  //  a recommended alternative to such situations where chip can be or not be present is to add a 10k or similar weak pulldown on the
-  //  open drain MISO input which can read noise/static and hence return a non 0 status byte, causing the while() to hang when a flash chip is not present
+  //  
+  //  Note: If the MISO line is high, busy() will return true. 
+  //        This can be a problem and cause the code to hang when there is noise/static on MISO data line when:
+  //        1) There is no flash chip connected
+  //        2) The flash chip connected is powered down, aka sleeping. 
   if (cmd != SPIFLASH_WAKE) while(busy());
   select();
   SPI.transfer(cmd);
