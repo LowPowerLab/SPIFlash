@@ -45,8 +45,6 @@ uint8_t SPIFlash::UNIQUEID[8];
 ///            Release Power-down / Device ID (ABh), per section 8.2.19 of the W25X40CL datasheet.
 ///            This means after using the sleep() function of this library, wake() must be the first
 ///            function called. If other commands are used, the flash chip will ignore the commands. 
-///            The risk is that the code can hang if there is noise/static on the MISO line,
-///            specifically noise/static that would evaluate to HIGH or 1.
 
 /// Constructor. JedecID is optional but recommended, since this will ensure that the device is present and has a valid response
 /// get this from the datasheet of your flash chip
@@ -302,8 +300,34 @@ void SPIFlash::blockErase64K(uint32_t addr) {
   unselect();
 }
 
+/// found() - checks there is a FLASH chip by checking the deviceID repeatedly - should be a consistent value
+uint8_t SPIFlash::found() {
+  uint16_t deviceID=0;
+  wakeup(); //if sleep() was previously called, wakeup() is required or it's non responsive
+  for (uint8_t i=0;i<10;i++) {
+    uint16_t idNow = readDeviceId();
+    if (idNow==0 || idNow==0xffff || (i>0 && idNow != deviceID)) {
+      deviceID=0;
+      break;
+    }
+    deviceID=idNow;
+  }
+  if (deviceID==0) { //NO FLASH CHIP FOUND, ABORTING
+    return false;
+  }
+  return true;
+}
+
+///regionIsEmpty() - check a random flashmem byte array is all clear and can be written to (ie. it's all 0xff)
+uint8_t SPIFlash::regionIsEmpty(uint32_t startAddress, uint8_t length) {
+  uint8_t flashBuf[length];
+  readBytes(startAddress, flashBuf, length);
+  for (uint8_t i=0;i<length;i++) if (flashBuf[i]!=0xff) return false;
+  return true;
+}
+
 /// Put flash memory chip into power down mode
-/// WARNING: after this command, only the wake and device_id commands are recognized
+/// WARNING: after this command, only the WAKEUP and DEVICE_ID commands are recognized
 /// hence a wakeup() command should be invoked first before further operations
 /// If a MCU soft restart is possible with flash chip left in sleep(), then a wakeup() command
 ///   should always be invoked before any other commands to ensure the flash chip was not left in sleep
