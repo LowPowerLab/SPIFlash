@@ -2,14 +2,17 @@
 // This sketch is an example of using the SPIFlash library with a Moteino
 // that has an onboard SPI Flash chip. This sketch listens to a few serial commands
 // Hence type the following commands to interact with the SPI flash memory array:
-// - 'd' dumps the first 256bytes of the flash chip to screen
-// - 'e' erases the entire memory chip
-// - 'i' print manufacturer/device ID
-// - [0-9] writes a random byte to addresses [0-9] (either 0xAA or 0xBB)
+//'c' - read flash chip's deviceID 10 times to ensure chip is present
+//'d' - dump first 256 bytes on the chip
+//'e' - erase entire flash chip
+//'E' - erase last 4K block in flash chip
+//'D' - dump first 256 bytes in the last 4K block
+//'i' - read deviceID
+//'0'-'9' - write 0xaa/0xbb bytes at addresses 0..9, 520192..520447
 // Get the SPIFlash library from here: https://github.com/LowPowerLab/SPIFlash
 // Note: if other SPI devices are present, ensure their CS pins are pulled up or set HIGH
 // **********************************************************************************
-// (C) 2020 Felix Rusu, LowPowerLab.com
+// (C) 2021 Felix Rusu, LowPowerLab.com
 // Library and code by Felix Rusu - felix@lowpowerlab.com
 // **********************************************************************************
 // License
@@ -81,7 +84,10 @@ void setup(){
   Serial.println("'c' - read flash chip's deviceID 10 times to ensure chip is present");
   Serial.println("'d' - dump first 256 bytes on the chip");
   Serial.println("'e' - erase entire flash chip");
+  Serial.println("'E' - erase last 4K block in flash chip");
+  Serial.println("'D' - dump first 256 bytes in the last 4K block");
   Serial.println("'i' - read deviceID");
+  Serial.println("'0'-'9' - write 0xaa/0xbb bytes at addresses 0..9, 520192..520447");
   Serial.println("************************\n");
   delay(1000);
 }
@@ -91,16 +97,26 @@ void loop(){
   // ie: display first 256 bytes in FLASH, erase chip, write bytes at first 10 positions, etc
   if (Serial.available() > 0) {
     input = Serial.read();
-    if (input == 'd') //d=dump flash area
-    {
-      Serial.println("Flash content:");
+    if (input == 'd') { //d=dump flash area
+      Serial.println("Flash content (256 bytes, starting address 0):");
       int counter = 0;
 
-      while(counter<=256){
-        Serial.print(flash.readByte(counter++), HEX);
-        Serial.print('.');
+      while(counter<256){
+        Serial.print(flash.readByte(counter), HEX);
+        counter++;
+        if (counter%16 == 0) Serial.println(); else Serial.print('.');
       }
-      
+      Serial.println();
+    }
+    else if (input == 'D') { //d=dump flash area @ last 4K block
+      Serial.println("Flash content (256bytes, starting address 520192):");
+      uint32_t counter = 520192;
+
+      while(counter<520192+256){
+        Serial.print(flash.readByte(counter), HEX);
+        counter++;
+        if (counter%16 == 0) Serial.println(); else Serial.print('.');
+      }
       Serial.println();
     }
     else if (input == 'c') {
@@ -126,6 +142,13 @@ void loop(){
       while(flash.busy());
       Serial.println("DONE");
     }
+    else if (input == 'E')
+    {
+      Serial.print("Erasing last 4K block @520192 ... ");
+      flash.blockErase4K(520192);
+      while(flash.busy());
+      Serial.println("DONE");
+    }
     else if (input == 'i')
     {
       Serial.print("DeviceID: ");
@@ -135,12 +158,12 @@ void loop(){
     {
       Serial.print("\nWriteByte("); Serial.print(input); Serial.print(")");
       flash.writeByte(input-48, millis()%2 ? 0xaa : 0xbb);
+      flash.writeByte(input-48+520192, millis()%2 ? 0xaa : 0xbb);
     }
   }
 
   // Periodically blink the onboard LED while listening for serial commands
-  if ((int)(millis()/500) > lastPeriod)
-  {
+  if ((int)(millis()/500) > lastPeriod) {
     lastPeriod++;
     digitalWrite(LED_BUILTIN, lastPeriod%2);
   }
