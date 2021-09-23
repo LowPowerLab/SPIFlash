@@ -34,6 +34,7 @@
 
 #include <SPIFlash.h>
 
+uint8_t SPIFlash::MANUFID[7];
 uint8_t SPIFlash::UNIQUEID[8];
 
 /// IMPORTANT: NAND FLASH memory requires erase before write, because
@@ -53,6 +54,7 @@ uint8_t SPIFlash::UNIQUEID[8];
 SPIFlash::SPIFlash(uint8_t slaveSelectPin, uint16_t jedecID) {
   _slaveSelectPin = slaveSelectPin;
   _jedecID = jedecID;
+  _fram_mode = false;
 }
 
 /// Select the flash chip
@@ -112,13 +114,16 @@ boolean SPIFlash::initialize()
     command(SPIFLASH_STATUSWRITE, true); // Write Status Register
     SPI.transfer(0);                     // Global Unprotect
     unselect();
+    command(SPIFLASH_STATUS3WRITE, true); // Write Status Register
+    SPI.transfer(0);                     // Write Protect scheme to Normal, not to Individual Block Locks
+    unselect();
     return true;
   }
   return false;
 }
 
 /// Get the manufacturer and device ID bytes (as a short word)
-uint16_t SPIFlash::readDeviceId()
+uint32_t SPIFlash::readDeviceId()
 {
 #if defined(__AVR_ATmega32U4__) // Arduino Leonardo, MoteinoLeo
   command(SPIFLASH_IDREAD); // Read JEDEC ID
@@ -126,8 +131,18 @@ uint16_t SPIFlash::readDeviceId()
   select();
   SPI.transfer(SPIFLASH_IDREAD);
 #endif
-  uint16_t jedecid = SPI.transfer(0) << 8;
+  uint32_t jedecid = SPI.transfer(0) << 16;
+  jedecid |= SPI.transfer(0) << 8;
   jedecid |= SPI.transfer(0);
+  if (jedecid == 0x7F7F) { // The 0x7F7F signature means it is a Cypress/Ramtron chip, the real ID will follow in additionnal bytes
+    _fram_mode = true;
+    MANUFID[0] = (jedecid & 0xFF00) >> 8;
+    MANUFID[1] = jedecid & 0x00FF;
+    for (uint8_t i=2;i<7;i++)
+      MANUFID[i] = SPI.transfer(0);
+    jedecid = SPI.transfer(0) << 8;
+    jedecid |= SPI.transfer(0);
+  }
   unselect();
   return jedecid;
 }
@@ -140,7 +155,10 @@ uint16_t SPIFlash::readDeviceId()
 /// flash.readUniqueId(); uint8_t* MAC = flash.readUniqueId(); for (uint8_t i=0;i<8;i++) { Serial.print(MAC[i], HEX); Serial.print(' '); }
 uint8_t* SPIFlash::readUniqueId()
 {
-  command(SPIFLASH_MACREAD);
+  if (_fram_mode)
+    command(SPIFLASH_SNREAD); // it is a Cypress/Ramtron chip
+  else
+    command(SPIFLASH_MACREAD);
   SPI.transfer(0);
   SPI.transfer(0);
   SPI.transfer(0);
@@ -149,6 +167,22 @@ uint8_t* SPIFlash::readUniqueId()
     UNIQUEID[i] = SPI.transfer(0);
   unselect();
   return UNIQUEID;
+}
+
+uint8_t* SPIFlash::readManufacturerId()
+{
+  if (_fram_mode)
+    readDeviceId(); // it is a Cypress/Ramtron chip
+  else {
+    command(SPIFLASH_MANUFIDREAD);
+    SPI.transfer(0);
+    SPI.transfer(0);
+    SPI.transfer(0);
+    for (uint8_t i=0;i<3;i++)
+      MANUFID[i] = SPI.transfer(0);
+    }
+  unselect();
+  return MANUFID;
 }
 
 /// read 1 byte from flash memory
@@ -216,6 +250,28 @@ uint8_t SPIFlash::readStatus()
 {
   select();
   SPI.transfer(SPIFLASH_STATUSREAD);
+  uint8_t status = SPI.transfer(0);
+  unselect();
+  return status;
+}
+
+
+/// return the STATUS2 register
+uint8_t SPIFlash::readStatus2()
+{
+  select();
+  SPI.transfer(SPIFLASH_STATUS2READ);
+  uint8_t status = SPI.transfer(0);
+  unselect();
+  return status;
+}
+
+
+/// return the STATUS3 register
+uint8_t SPIFlash::readStatus3()
+{
+  select();
+  SPI.transfer(SPIFLASH_STATUS3READ);
   uint8_t status = SPI.transfer(0);
   unselect();
   return status;

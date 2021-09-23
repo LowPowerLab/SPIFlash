@@ -6,6 +6,7 @@
 // DEPENDS ON: Arduino SPI library
 // > Updated Jan. 5, 2015, TomWS1, modified writeBytes to allow blocks > 256 bytes and handle page misalignment.
 // > Updated Feb. 26, 2015 TomWS1, added support for SPI Transactions (Arduino 1.5.8 and above)
+// > Updated Jan. 15, 2016 Martin ayotte, add readStatus2(), readStatus3(), readManufacturerId(), fix initialize(), readDeviceId() also return Size
 // > Selective merge by Felix after testing in IDE 1.0.6, 1.6.4
 // **********************************************************************************
 // License
@@ -76,6 +77,10 @@
                                               // but no actual need to wait for completion (instead need to check the status register BUSY bit)
 #define SPIFLASH_STATUSREAD       0x05        // read status register
 #define SPIFLASH_STATUSWRITE      0x01        // write status register
+#define SPIFLASH_STATUS2READ      0x35        // read status2 register
+#define SPIFLASH_STATUS2WRITE     0x31        // write status2 register
+#define SPIFLASH_STATUS3READ      0x15        // read status3 register
+#define SPIFLASH_STATUS3WRITE     0x11        // write status3 register
 #define SPIFLASH_ARRAYREAD        0x0B        // read array (fast, need to add 1 dummy byte after 3 address bytes)
 #define SPIFLASH_ARRAYREADLOWFREQ 0x03        // read array (low frequency)
 
@@ -85,15 +90,20 @@
 #define SPIFLASH_IDREAD           0x9F        // read JEDEC manufacturer and device ID (2 bytes, specific bytes for each manufacturer and device)
                                               // Example for Atmel-Adesto 4Mbit AT25DF041A: 0x1F44 (page 27: http://www.adestotech.com/sites/default/files/datasheets/doc3668.pdf)
                                               // Example for Winbond 4Mbit W25X40CL: 0xEF30 (page 14: http://www.winbond.com/NR/rdonlyres/6E25084C-0BFE-4B25-903D-AE10221A0929/0/W25X40CL.pdf)
+#define SPIFLASH_MANUFIDREAD      0x90        // another Manufacturer ID
 #define SPIFLASH_MACREAD          0x4B        // read unique ID number (MAC)
+#define SPIFLASH_SNREAD           0xC3        // read Serial Number (Cypress/Ramtron FRAM chip)
                                               
 class SPIFlash {
 public:
+  static uint8_t MANUFID[7];
   static uint8_t UNIQUEID[8];
   SPIFlash(uint8_t slaveSelectPin, uint16_t jedecID=0);
   boolean initialize();
   void command(uint8_t cmd, boolean isWrite=false);
   uint8_t readStatus();
+  uint8_t readStatus2();
+  uint8_t readStatus3();
   uint8_t readByte(uint32_t addr);
   void readBytes(uint32_t addr, void* buf, uint16_t len);
   void writeByte(uint32_t addr, uint8_t byt);
@@ -103,7 +113,8 @@ public:
   void blockErase4K(uint32_t address);
   void blockErase32K(uint32_t address);
   void blockErase64K(uint32_t addr);
-  uint16_t readDeviceId();
+  uint32_t readDeviceId();
+  uint8_t* readManufacturerId();
   uint8_t* readUniqueId();
   uint8_t found();
   uint8_t regionIsEmpty(uint32_t startAddress, uint8_t length);
@@ -115,6 +126,7 @@ protected:
   void select();
   void unselect();
   uint8_t _slaveSelectPin;
+  boolean _fram_mode;
   uint16_t _jedecID;
   uint8_t _SPCR;
   uint8_t _SPSR;
