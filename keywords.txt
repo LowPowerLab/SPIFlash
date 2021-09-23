@@ -1,5 +1,6 @@
 SPIFlash	KEYWORD1
 initialize	KEYWORD2
+begin	KEYWORD2
 command	KEYWORD2
 readStatus	KEYWORD2
 readByte	KEYWORD2

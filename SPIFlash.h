@@ -91,6 +91,8 @@ class SPIFlash {
 public:
   static uint8_t UNIQUEID[8];
   SPIFlash(uint8_t slaveSelectPin, uint16_t jedecID=0);
+  SPIFlash();
+  void begin(uint8_t slaveSelectPin, uint16_t jedecID=0);
   boolean initialize();
   void command(uint8_t cmd, boolean isWrite=false);
   uint8_t readStatus();

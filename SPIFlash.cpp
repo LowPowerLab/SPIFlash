@@ -55,6 +55,15 @@ SPIFlash::SPIFlash(uint8_t slaveSelectPin, uint16_t jedecID) {
   _jedecID = jedecID;
 }
 
+/// Empty constructor to permit late pin and JedecID assignment.
+SPIFlash::SPIFlash() {}
+
+/// Set the pin and JedecID. (Only needed if the empty constructor was used.)
+void SPIFlash::begin(uint8_t slaveSelectPin, uint16_t jedecID) {
+  _slaveSelectPin = slaveSelectPin;
+  _jedecID = jedecID;
+}
+
 /// Select the flash chip
 void SPIFlash::select() {
   //save current SPI settings
